@@ -1,4 +1,5 @@
 extern crate sdl2;
+mod text;
 
 use std::collections::HashSet;
 use std::path::Path;
@@ -8,6 +9,7 @@ use sdl2::pixels::Color;
 use sdl2::rect::{Point, Rect};
 use std::time::Duration;
 use sdl2::render::TextureQuery;
+use text::{render_score, load_font};
 
 const WINDOW_WIDTH: u32 = 800;
 const WINDOW_HEIGHT: u32 = 600;
@@ -39,9 +41,9 @@ fn main() {
 
     let mut red_rect = Rect::new(player_x, player_y, 50, 50);
 
-    let mut desired_pos =  red_rect;
-
     let mut keys_pressed: HashSet<Keycode> = HashSet::new();
+
+    let font = load_font().unwrap();
 
     'running: loop {
         for event in event_pump.poll_iter() {
@@ -140,10 +142,14 @@ fn main() {
         canvas.set_draw_color(Color::BLUE);
         draw_circle(&mut canvas, ball_pos, BALL_RADIUS);
 
+        render_score(&mut canvas, &font, score, 20.0, Color::RGB(0, 255, 0));
+
+
         canvas.present();
         println!("Score: {}", score);
 
-        if score == 100 {
+        if score == 10 {
+            show_alert_window(&sdl_context, "You are broke!");
             break 'running;
         }
 
@@ -180,16 +186,11 @@ fn draw_circle(canvas: &mut sdl2::render::Canvas<sdl2::video::Window>, center: P
         }
     }
 }
-// render a text in the canvas at the given position
-fn render_win() {
 
-
-}
-
-fn show_alert_window(sdl_context: &sdl2::Sdl) {
+fn show_alert_window(sdl_context: &sdl2::Sdl, x: &str) {
     let video_subsystem = sdl_context.video().unwrap();
     let window = video_subsystem
-        .window("Swallowed your salary", 400, 200)
+        .window("You are broke", 300, 50)
         .position_centered()
         .build()
         .unwrap();
